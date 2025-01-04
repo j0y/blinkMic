@@ -15,9 +15,9 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
     micStatusCheckbox.addEventListener('change', handleCheckboxShowMicStatusChange);
     blinkCheckbox.addEventListener('change', handleCheckboxBlinkIfTryMutedChange);
-    activeColorInput.addEventListener('input', handleActiveColorInputChange);
-    mutedColorInput.addEventListener('input', handleMutedColorInputChange);
-    mutedTryColorInput.addEventListener('input', handleMutedTryColorInputChange);
+    activeColorInput.addEventListener('change', handleActiveColorInputChange);
+    mutedColorInput.addEventListener('change', handleMutedColorInputChange);
+    mutedTryColorInput.addEventListener('change', handleMutedTryColorInputChange);
 
     function handleCheckboxShowMicStatusChange(event) {
         chrome.storage.sync.set({ 'dont-show-mic-status': event.target.checked });

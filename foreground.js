@@ -11,6 +11,10 @@ class Blink { // eslint-disable-line
     #isSupported = false;
     #isInAPattern = false;
 
+    #activeColor = [0, 255, 0];  // green
+    #mutedColor = [255, 0, 0];  // red
+    #attentionColor = [255, 0, 0]; // red
+
     /**
      * Constructor
      */
@@ -21,6 +25,12 @@ class Blink { // eslint-disable-line
         if (!this.#isSupported) {
             return;
         }
+
+        chrome.storage.sync.get(['active-color', 'muted-color', 'muted-try-color'], (items) => {
+            this.#activeColor = this.hexToRgbArray(items['active-color']) || [0, 255, 0];
+            this.#mutedColor =  this.hexToRgbArray(items['muted-color']) || [255, 0, 0];
+            this.#attentionColor = this.hexToRgbArray(items['muted-try-color']) || [255, 0, 0];
+        })
 
         // Handle behaviour when the device is connected, or re-connected.
         navigator.hid.addEventListener('connect', async (event) => {
@@ -64,6 +74,22 @@ class Blink { // eslint-disable-line
      */
     get isConnected() {
         return this.#device?.opened ? true : false;
+    }
+
+    hexToRgbArray(hex) {
+        if (hex === undefined) {
+            return undefined;
+        }
+        // Remove the '#' if it exists
+        hex = hex.replace(/^#/, '');
+    
+        // Parse the r, g, b values
+        const bigint = parseInt(hex, 16);
+        const r = (bigint >> 16) & 255;
+        const g = (bigint >> 8) & 255;
+        const b = bigint & 255;
+    
+        return [r, g, b];
     }
 
     /**
@@ -236,21 +262,20 @@ class Blink { // eslint-disable-line
         if (this.#isInAPattern) {
             return;
         }
-        let acolor = [0, 255, 0];  // red
-        await this.fadeToColor(acolor);
+        await this.fadeToColor(this.#activeColor);
     }
     async setColorBlocked() {
         if (this.#isInAPattern) {
             return;
         }
         let acolor = [255, 0, 0];
-        await this.fadeToColor(acolor);
+        await this.fadeToColor(this.#mutedColor);
     }
 
     async signalAtention() {
         this.#isInAPattern = true;
         const delay = 300;
-        let acolor = [0, 0, 255];
+        let acolor = this.#attentionColor;
         await this.fadeToColor(acolor);
         await this.sleep(delay);
         await this.turnOff();
