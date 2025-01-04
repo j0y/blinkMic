@@ -1,0 +1,19 @@
+{
+    "manifest_version": 3,
+    "name": "Blink(1) Goolge Meet microphone indicator",
+    "description": "Microphone indicator for Google Meet using blink(1) device",
+    "version": "1",
+    "icons": {
+        "16": "logo/logo-16.png",
+        "48": "logo/logo-48.png",
+        "128": "logo/logo-128.png"
+    },
+    "permissions": [],
+    "host_permissions": [
+        "*://*/*"
+    ],
+    "content_scripts": [{
+        "js": ["foreground.js"],
+        "matches": ["*://meet.google.com/*"]
+    }]
+}
