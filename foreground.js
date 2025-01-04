@@ -231,9 +231,28 @@ class Blink { // eslint-disable-line
         });
     }
 
-    async handleConnectClick() {
+    async setColorActive() {
         let acolor = [255, 0, 255];  // purple
         await this.fadeToColor(acolor);
+    }
+    async setColorBlocked() {
+        let acolor = [255, 255, 0];
+        await this.fadeToColor(acolor);
+    }
+
+    async signalAtention() {
+        let acolor = [255, 255, 0];
+        await this.fadeToColor(acolor);
+        await this.sleep(500);
+        await this.turnOff();
+        await this.sleep(500);
+        await this.fadeToColor(acolor);
+        await this.sleep(500);
+        await this.turnOff();
+    }
+
+    sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
     }
 
     async fadeToColor([r, g, b]) {
@@ -261,13 +280,14 @@ class MeetWrapper { // eslint-disable-line
     constructor(blinkDevice) {
         this.#blinkDevice = blinkDevice;
 
+        if (document.querySelector('div[data-meeting-title]')) {
+            this.checkState();
+        }
 
-        //TODO: check if device was connected just now and initialize state.
-        // Cause this runs only on change.
-        const bodyObserver = new MutationObserver(() => {
+        const bodyObserver = new MutationObserver((mutations, observer) => {
             if (document.querySelector('div[data-meeting-title]')) {
                 //in a meeting
-                this.#blinkDevice.handleConnectClick();
+                this.checkState();
             } else if (document.querySelector('[jscontroller=dyDNGc]')) {
                 // in lobby
                 this.#blinkDevice.turnOff();
@@ -277,6 +297,46 @@ class MeetWrapper { // eslint-disable-line
             }
         });
         bodyObserver.observe(document.body, { attributes: true, childList: true });
+
+
+        const mutedObserver = new MutationObserver((mutations, observer) => {
+            console.log('mutedAttempt', mutations)
+            mutations.forEach((m) => {
+                if (m.type == 'childList') {
+                    m.addedNodes.forEach(async (n) => {
+                        if (
+                            n instanceof HTMLDivElement &&
+                            n.getAttribute('aria-label') === "Are you talking? Your mic is off."
+                        ) {
+                            console.log('signaling muted state')
+                            await this.#blinkDevice.signalAtention();
+                            this.checkState();
+                        }
+                    })
+                }
+            })
+        })
+        mutedObserver.observe(document.body, {
+            subtree: true,
+            childList: true,
+            attributes: true,
+            attributeFilter: ['aria-label']
+        })
+    }
+
+    checkState() {
+        console.log('checkState');
+        // Check if the user is muted or not.
+        const muted = document.querySelector('button[data-mute-button]')?.getAttribute('data-is-muted') == 'true';
+        this.setMutedState(muted);
+    }
+
+    setMutedState(muted) {
+        if (muted) {
+            this.#blinkDevice.setColorBlocked();
+        } else {
+            this.#blinkDevice.setColorActive();
+        }
     }
 }
 
