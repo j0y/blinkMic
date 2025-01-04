@@ -9,6 +9,7 @@ class Blink { // eslint-disable-line
 
     #device;
     #isSupported = false;
+    #isInAPattern = false;
 
     /**
      * Constructor
@@ -232,23 +233,37 @@ class Blink { // eslint-disable-line
     }
 
     async setColorActive() {
-        let acolor = [255, 0, 255];  // purple
+        if (this.#isInAPattern) {
+            return;
+        }
+        let acolor = [0, 255, 0];  // red
         await this.fadeToColor(acolor);
     }
     async setColorBlocked() {
-        let acolor = [255, 255, 0];
+        if (this.#isInAPattern) {
+            return;
+        }
+        let acolor = [255, 0, 0];
         await this.fadeToColor(acolor);
     }
 
     async signalAtention() {
-        let acolor = [255, 255, 0];
+        this.#isInAPattern = true;
+        const delay = 300;
+        let acolor = [0, 0, 255];
         await this.fadeToColor(acolor);
-        await this.sleep(500);
+        await this.sleep(delay);
         await this.turnOff();
-        await this.sleep(500);
+        await this.sleep(delay);
         await this.fadeToColor(acolor);
-        await this.sleep(500);
+        await this.sleep(delay);
         await this.turnOff();
+        await this.sleep(delay);
+        await this.fadeToColor(acolor);
+        await this.sleep(delay);
+        await this.turnOff();
+        await this.sleep(delay);
+        this.#isInAPattern = false;
     }
 
     sleep(ms) {
