@@ -15,6 +15,8 @@ class Blink { // eslint-disable-line
     #mutedColor = [255, 0, 0];  // red
     #attentionColor = [255, 0, 0]; // red
 
+    #side = 0x00; //both
+
     /**
      * Constructor
      */
@@ -26,10 +28,11 @@ class Blink { // eslint-disable-line
             return;
         }
 
-        chrome.storage.sync.get(['active-color', 'muted-color', 'muted-try-color'], (items) => {
+        chrome.storage.sync.get(['active-color', 'muted-color', 'muted-try-color', 'sides'], (items) => {
             this.#activeColor = this.hexToRgbArray(items['active-color']) || [0, 255, 0];
-            this.#mutedColor =  this.hexToRgbArray(items['muted-color']) || [255, 0, 0];
+            this.#mutedColor = this.hexToRgbArray(items['muted-color']) || [255, 0, 0];
             this.#attentionColor = this.hexToRgbArray(items['muted-try-color']) || [255, 0, 0];
+            this.#side = items['sides'] || 0x00;
         })
 
         // Handle behaviour when the device is connected, or re-connected.
@@ -82,13 +85,13 @@ class Blink { // eslint-disable-line
         }
         // Remove the '#' if it exists
         hex = hex.replace(/^#/, '');
-    
+
         // Parse the r, g, b values
         const bigint = parseInt(hex, 16);
         const r = (bigint >> 16) & 255;
         const g = (bigint >> 8) & 255;
         const b = bigint & 255;
-    
+
         return [r, g, b];
     }
 
@@ -298,7 +301,7 @@ class Blink { // eslint-disable-line
     async fadeToColor([r, g, b]) {
         this.#readyOrThrow();
         const reportId = 1;
-        const data = Uint8Array.from([0x63, r, g, b, 0x00, 0x10, 0x00, 0x00]);
+        const data = Uint8Array.from([0x63, r, g, b, 0x00, 0x10, this.#side, 0x00]);
         try {
             await this.#device.sendFeatureReport(reportId, data);
         } catch (error) {
@@ -373,7 +376,7 @@ class MeetWrapper { // eslint-disable-line
 
     setSettings(items) {
         this.#dontBlinkIfTryMuted = items['dont-blink-if-try-muted'] === true;
-        this.#dontShowMicStatus =  items['dont-show-mic-status'] === true;
+        this.#dontShowMicStatus = items['dont-show-mic-status'] === true;
     }
 
     checkState() {
