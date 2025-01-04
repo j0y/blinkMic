@@ -286,6 +286,8 @@ class Blink { // eslint-disable-line
 
 class MeetWrapper { // eslint-disable-line
     #blinkDevice;
+    #dontBlinkIfTryMuted = false;
+    #dontShowMicStatus = false;
 
     /**
      * Constructor
@@ -294,6 +296,8 @@ class MeetWrapper { // eslint-disable-line
      */
     constructor(blinkDevice) {
         this.#blinkDevice = blinkDevice;
+
+        chrome.storage.sync.get(['dont-blink-if-try-muted', 'dont-show-mic-status']).then((items) => this.setSettings(items));
 
         if (document.querySelector('div[data-meeting-title]')) {
             this.checkState();
@@ -323,6 +327,9 @@ class MeetWrapper { // eslint-disable-line
                             n instanceof HTMLDivElement &&
                             n.getAttribute('aria-label') === "Are you talking? Your mic is off."
                         ) {
+                            if (this.#dontBlinkIfTryMuted) {
+                                return;
+                            }
                             console.log('signaling muted state')
                             await this.#blinkDevice.signalAtention();
                             this.checkState();
@@ -339,14 +346,19 @@ class MeetWrapper { // eslint-disable-line
         })
     }
 
+    setSettings(items) {
+        this.#dontBlinkIfTryMuted = items['dont-blink-if-try-muted'] === true;
+        this.#dontShowMicStatus =  items['dont-show-mic-status'] === true;
+    }
+
     checkState() {
         console.log('checkState');
         // Check if the user is muted or not.
-        const muted = document.querySelector('button[data-mute-button]')?.getAttribute('data-is-muted') == 'true';
-        this.setMutedState(muted);
-    }
+        if (this.#dontShowMicStatus) {
+            return;
+        }
 
-    setMutedState(muted) {
+        const muted = document.querySelector('button[data-mute-button]')?.getAttribute('data-is-muted') == 'true';
         if (muted) {
             this.#blinkDevice.setColorBlocked();
         } else {

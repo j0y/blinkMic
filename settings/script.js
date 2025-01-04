@@ -5,11 +5,13 @@ document.addEventListener('DOMContentLoaded', (event) => {
     const mutedColorInput = document.getElementById('muted-color-input');
     const mutedTryColorInput = document.getElementById('muted-try-color-input');
 
-    micStatusCheckbox.checked = localStorage.getItem('dont-show-mic-status') === 'true';
-    blinkCheckbox.checked = localStorage.getItem('dont-blink-if-try-muted') === 'true';
-    activeColorInput.value = localStorage.getItem('active-color') || '#00ff00';
-    mutedColorInput.value = localStorage.getItem('muted-color') || '#ff0000';
-    mutedTryColorInput.value = localStorage.getItem('muted-try-color') || '#ff0000';
+    chrome.storage.sync.get(['dont-show-mic-status', 'dont-blink-if-try-muted', 'active-color', 'muted-color', 'muted-try-color'], function (items) {
+        micStatusCheckbox.checked = items['dont-show-mic-status'] === true;
+        blinkCheckbox.checked = items['dont-blink-if-try-muted'] === true;
+        activeColorInput.value = items['active-color'] || '#00ff00';
+        mutedColorInput.value = items['muted-color'] || '#ff0000';
+        mutedTryColorInput.value = items['muted-try-color'] || '#ff0000';
+    });
 
     micStatusCheckbox.addEventListener('change', handleCheckboxShowMicStatusChange);
     blinkCheckbox.addEventListener('change', handleCheckboxBlinkIfTryMutedChange);
@@ -18,19 +20,19 @@ document.addEventListener('DOMContentLoaded', (event) => {
     mutedTryColorInput.addEventListener('input', handleMutedTryColorInputChange);
 
     function handleCheckboxShowMicStatusChange(event) {
-        localStorage.setItem('dont-show-mic-status', event.target.checked);
+        chrome.storage.sync.set({ 'dont-show-mic-status': event.target.checked });
     }
     function handleCheckboxBlinkIfTryMutedChange(event) {
-        localStorage.setItem('dont-blink-if-try-muted', event.target.checked);
+        chrome.storage.sync.set({ 'dont-blink-if-try-muted': event.target.checked });
     }
 
     function handleActiveColorInputChange(event) {
-        localStorage.setItem('active-color', event.target.value);
+        chrome.storage.sync.set({ 'active-color': event.target.value });
     }
     function handleMutedColorInputChange(event) {
-        localStorage.setItem('muted-color', event.target.value);
+        chrome.storage.sync.set({ 'muted-color': event.target.value });
     }
     function handleMutedTryColorInputChange(event) {
-        localStorage.setItem('muted-try-color', event.target.value);
+        chrome.storage.sync.set({ 'muted-try-color': event.target.value });
     }
 });
