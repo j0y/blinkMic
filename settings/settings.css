@@ -1,0 +1,8 @@
+body {
+    padding: 2rem;
+    font-size: large;
+
+    * {
+        margin: 5px;
+    }
+}

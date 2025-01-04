@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="stylesheet" href="settings.css">
+    <script type="module" src="script.js"></script>
+    <title>Chrome Addon v3: Settings</title>
+</head>
+
+<body>
+    <section>
+        <label for="blink-if-try-muted">
+            <input type="checkbox" id="blink-if-try-muted" /> Don't blink if sound is detected, but microphone is muted
+        </label>
+    </section>
+    <section>
+        <label for="show-mic-status">
+            <input type="checkbox" id="show-mic-status" value= />Don't show microphone status
+        </label>
+    </section>
+
+    <section>
+        <input type="color" id="active-color-input" name="active-color-input" />
+        <label for="active-color-input">Active color</label>
+    </section>
+    <section>
+        <input type="color" id="muted-color-input" name="muted-color-input" />
+        <label for="muted-color-input">Muted color</label>
+    </section>
+    <section>
+        <input type="color" id="muted-try-color-input" name="muted-try-color-input" />
+        <label for="muted-try-color-input">Muted attempt color</label>
+    </section>
+</body>
+
+</html>
