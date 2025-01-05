@@ -111,7 +111,7 @@ class Blink { // eslint-disable-line
         if (!this.#device) {
             return false;
         }
-        console.log('*Blink-Meet*', `Found Blink '${this.#device.productId}'`);
+        //console.log('*Blink-Meet*', `Found Blink '${this.#device.productId}'`);
 
         if (this.#device.opened) {
             return true;
@@ -134,7 +134,7 @@ class Blink { // eslint-disable-line
      * @fires Blink#disconnect Notifies listeners we're no longer connected.
      */
     async disconnect() {
-        console.log('*Blink-Meet*', 'Disconnecting Blink');
+        //console.log('*Blink-Meet*', 'Disconnecting Blink');
         if (!this.#device) {
             return;
         }
@@ -175,7 +175,7 @@ class Blink { // eslint-disable-line
         const vendorId = 0x27b8; // blink1 vid
         const productId = 0x01ed;  // blink1 pid
         const device_list = await navigator.hid.getDevices();
-        console.log(device_list)
+        //console.log(device_list)
 
         let device = device_list.find(d => d.vendorId === vendorId && d.productId === productId);
         if (device) {
@@ -192,7 +192,7 @@ class Blink { // eslint-disable-line
      */
     async turnOff() {
         if (!this.#device?.opened) {
-            console.log('already disconnected.');
+            //console.log('already disconnected.');
             return;
         }
         // turn black
@@ -347,7 +347,7 @@ class MeetWrapper { // eslint-disable-line
 
 
         const mutedObserver = new MutationObserver((mutations, observer) => {
-            console.log('mutedAttempt', mutations)
+            //console.log('mutedAttempt', mutations)
             mutations.forEach((m) => {
                 if (m.type == 'childList') {
                     m.addedNodes.forEach(async (n) => {
@@ -358,7 +358,7 @@ class MeetWrapper { // eslint-disable-line
                             if (this.#dontBlinkIfTryMuted) {
                                 return;
                             }
-                            console.log('signaling muted state')
+                            //console.log('signaling muted state')
                             await this.#blinkDevice.signalAtention();
                             this.checkState();
                         }
@@ -380,7 +380,7 @@ class MeetWrapper { // eslint-disable-line
     }
 
     checkState() {
-        console.log('checkState');
+        //console.log('checkState');
         // Check if the user is muted or not.
         if (this.#dontShowMicStatus) {
             return;
