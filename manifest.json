@@ -16,7 +16,7 @@
         "storage"
     ],
     "host_permissions": [
-        "*://*/*"
+        "*://meet.google.com/*"
     ],
     "content_scripts": [{
         "js": ["foreground.js"],
